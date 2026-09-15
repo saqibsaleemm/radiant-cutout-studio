@@ -3,6 +3,7 @@ import { Scissors, Sparkles, Cpu, Smartphone } from "lucide-react";
 import { CutoutStudio } from "@/components/studio/CutoutStudio";
 
 export const Route = createFileRoute("/")({
+  staticData: { sitemap: true },
   head: () => ({
     meta: [
       { title: "Cutout Studio — AI Background Remover for PNG & JPEG" },
@@ -18,8 +19,10 @@ export const Route = createFileRoute("/")({
           "Drag, drop and cut out any photo in seconds. Transparent PNG, solid, gradient or photo backgrounds — all in your browser.",
       },
       { property: "og:type", content: "website" },
+      { property: "og:url", content: "https://radiant-cutout-studio.lovable.app/" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
+    links: [{ rel: "canonical", href: "https://radiant-cutout-studio.lovable.app/" }],
   }),
   component: Index,
 });
