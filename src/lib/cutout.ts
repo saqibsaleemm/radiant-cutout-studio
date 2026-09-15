@@ -65,9 +65,55 @@ function canvasToBlob(canvas: HTMLCanvasElement, type = "image/png", quality?: n
   });
 }
 
+function blobToBase64(blob: Blob) {
+  return new Promise<string>((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const result = String(reader.result);
+      resolve(result.slice(result.indexOf(",") + 1));
+    };
+    reader.onerror = () => reject(new Error("Could not read the image."));
+    reader.readAsDataURL(blob);
+  });
+}
+
+function maskFromImage(source: HTMLCanvasElement, cut: HTMLImageElement) {
+  const mask = createCanvas(source.width, source.height);
+  const mctx = ctxOf(mask);
+  mctx.imageSmoothingQuality = "high";
+  mctx.drawImage(cut, 0, 0, source.width, source.height);
+  return mask;
+}
+
 /**
- * Runs the AI segmentation model and returns a mask canvas the size of `source`.
- * The mask's alpha channel marks the subject.
+ * Removes the background with the remove.bg service (highest accuracy on hair
+ * and transparent objects). Returns a mask canvas the size of `source`.
+ */
+export async function buildMaskRemote(
+  source: HTMLCanvasElement,
+  onProgress?: (p: Progress) => void,
+): Promise<HTMLCanvasElement> {
+  const { removeBackgroundRemote } = await import("@/lib/removebg.functions");
+
+  const small = fitWithin(source.width, source.height, MAX_MODEL_EDGE);
+  const input = createCanvas(small.width, small.height);
+  ctxOf(input).drawImage(source, 0, 0, small.width, small.height);
+  const inputBlob = await canvasToBlob(input);
+
+  onProgress?.({ label: "Sending to the AI cutout service", value: 30 });
+  const imageBase64 = await blobToBase64(inputBlob);
+  const { pngBase64 } = await removeBackgroundRemote({ data: { imageBase64 } });
+
+  onProgress?.({ label: "Detecting edges", value: 80 });
+  const cut = await loadImage(`data:image/png;base64,${pngBase64}`);
+  const mask = maskFromImage(source, cut);
+  onProgress?.({ label: "Finishing up", value: 100 });
+  return mask;
+}
+
+/**
+ * Runs the on-device AI segmentation model and returns a mask canvas the size of
+ * `source`. Used as a fallback when the cutout service is unavailable.
  */
 export async function buildMask(
   source: HTMLCanvasElement,
@@ -79,6 +125,7 @@ export async function buildMask(
   const input = createCanvas(small.width, small.height);
   ctxOf(input).drawImage(source, 0, 0, small.width, small.height);
   const inputBlob = await canvasToBlob(input);
+
 
   const resultBlob = await removeBackground(inputBlob, {
     output: { format: "image/png", quality: 1 },
