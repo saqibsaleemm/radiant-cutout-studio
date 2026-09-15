@@ -36,7 +36,7 @@ function Index() {
       <header className="mb-10 space-y-5 text-center sm:mb-14">
         <span className="inline-flex items-center gap-2 rounded-full border border-border bg-secondary/60 px-3 py-1 text-xs text-muted-foreground">
           <Scissors className="size-3.5 text-primary" aria-hidden="true" />
-          Private, on-device background removal
+          Studio-grade AI background removal
         </span>
         <h1 className="font-display text-4xl font-bold leading-[1.05] sm:text-6xl">
           Cut anything out of <span className="text-gradient">any photo</span>
