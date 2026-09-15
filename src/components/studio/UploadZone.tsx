@@ -70,7 +70,7 @@ export function UploadZone({ onFile, onInvalid, compact = false }: Props) {
 
       {!compact && (
         <p className="text-xs text-muted-foreground">
-          Everything runs on your device — your photos never leave this browser.
+          Your photo is processed for the cutout only — it is never stored.
         </p>
       )}
     </div>

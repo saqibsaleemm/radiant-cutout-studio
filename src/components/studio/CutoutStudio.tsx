@@ -17,6 +17,7 @@ import { UploadZone } from "@/components/studio/UploadZone";
 import { BackgroundPicker } from "@/components/studio/BackgroundPicker";
 import {
   buildMask,
+  buildMaskRemote,
   cloneCanvas,
   downloadBlob,
   exportCanvas,
@@ -28,6 +29,22 @@ import {
 } from "@/lib/cutout";
 
 type Tool = "erase" | "restore";
+
+/** Cloud cutout first (best edge accuracy), on-device model as a fallback. */
+async function makeMask(
+  source: HTMLCanvasElement,
+  onProgress: (p: ProgressState) => void,
+): Promise<HTMLCanvasElement> {
+  try {
+    return await buildMaskRemote(source, onProgress);
+  } catch (error) {
+    console.error("Cloud cutout unavailable, falling back on-device:", error);
+    toast.info("Using the on-device cutout", {
+      description: "The cutout service was unavailable, so we processed it in your browser.",
+    });
+    return buildMask(source, onProgress);
+  }
+}
 
 export function CutoutStudio() {
   const sourceRef = useRef<HTMLCanvasElement | null>(null);
@@ -81,7 +98,7 @@ export function CutoutStudio() {
         const source = await fileToCanvas(file);
         sourceRef.current = source;
         setDimensions({ width: source.width, height: source.height });
-        const mask = await buildMask(source, setBusy);
+        const mask = await makeMask(source, setBusy);
         maskRef.current = mask;
         setReady(true);
         toast.success("Background removed", {
@@ -158,7 +175,7 @@ export function CutoutStudio() {
     if (!source) return;
     setBusy({ label: "Re-running the AI", value: 10 });
     try {
-      maskRef.current = await buildMask(source, setBusy);
+      maskRef.current = await makeMask(source, setBusy);
       historyRef.current = [];
       setHistoryDepth(0);
       draw();
