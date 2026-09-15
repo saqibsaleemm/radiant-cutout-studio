@@ -30,6 +30,22 @@ import {
 
 type Tool = "erase" | "restore";
 
+/** Cloud cutout first (best edge accuracy), on-device model as a fallback. */
+async function makeMask(
+  source: HTMLCanvasElement,
+  onProgress: (p: ProgressState) => void,
+): Promise<HTMLCanvasElement> {
+  try {
+    return await buildMaskRemote(source, onProgress);
+  } catch (error) {
+    console.error("Cloud cutout unavailable, falling back on-device:", error);
+    toast.info("Using the on-device cutout", {
+      description: "The cutout service was unavailable, so we processed it in your browser.",
+    });
+    return buildMask(source, onProgress);
+  }
+}
+
 export function CutoutStudio() {
   const sourceRef = useRef<HTMLCanvasElement | null>(null);
   const maskRef = useRef<HTMLCanvasElement | null>(null);
