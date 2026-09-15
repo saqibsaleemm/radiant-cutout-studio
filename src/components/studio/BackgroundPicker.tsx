@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
 import { loadImage, type BackgroundOption } from "@/lib/cutout";
 
-const SOLIDS = ["#ffffff", "#0f1115", "#f5e9d7", "#0d4f4a", "#1f3a8a", "#b91c3c", "#e11d74"];
+const SOLIDS: string[] = ["#ffffff", "#0f1115", "#f5e9d7", "#0d4f4a", "#1f3a8a", "#b91c3c", "#e11d74"];
 const GRADIENTS: Array<{ from: string; to: string }> = [
   { from: "#a3e635", to: "#22d3ee" },
   { from: "#fda4af", to: "#fcd34d" },
@@ -47,7 +47,7 @@ export function BackgroundPicker({ value, onChange, onError }: Props) {
         <Button
           size="sm"
           variant={value.type === "color" ? "toolActive" : "tool"}
-          onClick={() => onChange({ type: "color", color: SOLIDS[0] })}
+          onClick={() => onChange({ type: "color", color: SOLIDS[0] ?? "#ffffff" })}
         >
           <Palette className="size-4" aria-hidden="true" />
           Color
@@ -56,7 +56,7 @@ export function BackgroundPicker({ value, onChange, onError }: Props) {
           size="sm"
           variant={value.type === "gradient" ? "toolActive" : "tool"}
           onClick={() =>
-            onChange({ type: "gradient", from: GRADIENTS[0].from, to: GRADIENTS[0].to, angle: 135 })
+            onChange({ type: "gradient", from: GRADIENTS[0]?.from ?? "#a3e635", to: GRADIENTS[0]?.to ?? "#22d3ee", angle: 135 })
           }
         >
           <Blend className="size-4" aria-hidden="true" />
@@ -130,7 +130,7 @@ export function BackgroundPicker({ value, onChange, onError }: Props) {
               min={0}
               max={360}
               step={5}
-              onValueChange={([angle]) => onChange({ ...value, angle })}
+              onValueChange={(v) => onChange({ ...value, angle: v[0] ?? value.angle })}
             />
           </div>
         </div>

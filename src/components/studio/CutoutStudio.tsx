@@ -278,7 +278,7 @@ export function CutoutStudio() {
               min={6}
               max={200}
               step={2}
-              onValueChange={([v]) => setBrushSize(v)}
+              onValueChange={(v) => setBrushSize(v[0] ?? brushSize)}
             />
           </div>
           <div className="space-y-2">
@@ -288,7 +288,7 @@ export function CutoutStudio() {
               min={5}
               max={100}
               step={5}
-              onValueChange={([v]) => setHardness(v)}
+              onValueChange={(v) => setHardness(v[0] ?? hardness)}
             />
           </div>
           <div className="space-y-2">
@@ -300,7 +300,7 @@ export function CutoutStudio() {
               min={0}
               max={8}
               step={0.5}
-              onValueChange={([v]) => setFeather(v)}
+              onValueChange={(v) => setFeather(v[0] ?? feather)}
             />
           </div>
         </section>
