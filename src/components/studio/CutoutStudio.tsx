@@ -98,7 +98,7 @@ export function CutoutStudio() {
         const source = await fileToCanvas(file);
         sourceRef.current = source;
         setDimensions({ width: source.width, height: source.height });
-        const mask = await buildMask(source, setBusy);
+        const mask = await makeMask(source, setBusy);
         maskRef.current = mask;
         setReady(true);
         toast.success("Background removed", {
@@ -175,7 +175,7 @@ export function CutoutStudio() {
     if (!source) return;
     setBusy({ label: "Re-running the AI", value: 10 });
     try {
-      maskRef.current = await buildMask(source, setBusy);
+      maskRef.current = await makeMask(source, setBusy);
       historyRef.current = [];
       setHistoryDepth(0);
       draw();
