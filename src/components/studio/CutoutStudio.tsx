@@ -17,6 +17,7 @@ import { UploadZone } from "@/components/studio/UploadZone";
 import { BackgroundPicker } from "@/components/studio/BackgroundPicker";
 import {
   buildMask,
+  buildMaskRemote,
   cloneCanvas,
   downloadBlob,
   exportCanvas,
